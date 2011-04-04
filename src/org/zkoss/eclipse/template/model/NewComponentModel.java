@@ -13,10 +13,10 @@ import java.util.HashMap;
 public class NewComponentModel implements TemplateModel {
 	private String addonName;
 	private String version = "0.8.0";
-	private String tagName;
+	private String componentName;
 
 	private String componentPackage;
-	private String componentName;
+	private String componentClass;
 
 	private String widgetPackage;
 
@@ -25,7 +25,7 @@ public class NewComponentModel implements TemplateModel {
 	private String zkVersionSince = "5.0.5";
 
 	public String getAddonName() {
-		return addonName == null ? tagName : addonName;
+		return addonName == null ? componentName : addonName;
 	}
 
 	public void setAddonName(String addonName) {
@@ -40,12 +40,12 @@ public class NewComponentModel implements TemplateModel {
 		this.version = version;
 	}
 
-	public String getTagName() {
-		return tagName;
+	public String getComponentName() {
+		return componentName;
 	}
 
-	public void setTagName(String tagName) {
-		this.tagName = tagName;
+	public void setComponentName(String tagName) {
+		this.componentName = tagName;
 	}
 
 	public String getComponentPackage() {
@@ -64,12 +64,12 @@ public class NewComponentModel implements TemplateModel {
 		this.componentPackage = componentPackage;
 	}
 
-	public String getComponentName() {
-		return componentName;
+	public String getComponentClass() {
+		return componentClass;
 	}
 
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
+	public void setComponentClass(String componentName) {
+		this.componentClass = componentName;
 	}
 
 	public String getWidgetPackage() {
@@ -105,11 +105,11 @@ public class NewComponentModel implements TemplateModel {
 
 		putWithoutNull(map, "addon-name", getAddonName());
 		putWithoutNull(map, "version", getVersion());
-		putWithoutNull(map, "tag-name", getTagName());
+		putWithoutNull(map, "component-name", getComponentName());
 
 		putWithoutNull(map, "component-package-no-dot", getComponentPackageNoDot());
 		putWithoutNull(map, "component-package", getComponentPackage());
-		putWithoutNull(map, "component-name", getComponentName());
+		putWithoutNull(map, "component-class", getComponentClass());
 
 		putWithoutNull(map, "widget-package", getWidgetPackage());
 		putWithoutNull(map, "widget-name", getWidgetName());

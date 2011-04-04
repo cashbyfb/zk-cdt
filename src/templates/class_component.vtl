@@ -3,7 +3,7 @@ package ${component-package-no-dot};
 import org.zkoss.lang.Objects;
 import org.zkoss.zul.impl.XulElement;
 
-public class ${component-name} extends XulElement  {
+public class ${component-class} extends XulElement  {
 
 	/* Here's a simple example for how to implements a member field */
 
@@ -31,10 +31,10 @@ public class ${component-name} extends XulElement  {
 	}
 
 	/**
-	 * The default zclass is "z-${tag-name}"
+	 * The default zclass is "z-${component-name}"
 	 */
 	public String getZclass() {
-		return (this._zclass != null ? this._zclass : "z-${tag-name}");
+		return (this._zclass != null ? this._zclass : "z-${component-name}");
 	}
 }
 

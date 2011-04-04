@@ -25,8 +25,8 @@ import org.eclipse.swt.widgets.Text;
 public class NewComponentWizardPage extends WizardPage {
 
 	private Text projectNameText;
-	private Text tagNameText;
 	private Text componentNameText;
+	private Text componentClassText;
 	private Text widgetNameText;
 
 	/**
@@ -76,23 +76,23 @@ public class NewComponentWizardPage extends WizardPage {
 		});
 
 		label = new Label(container, SWT.NULL);
-		label.setText("&Tag name:");
-
-		tagNameText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		tagNameText.setLayoutData(gd);
-		tagNameText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-			}
-		});
-
-		label = new Label(container, SWT.NULL);
 		label.setText("&Component name:");
 
 		componentNameText = new Text(container, SWT.BORDER | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		componentNameText.setLayoutData(gd);
 		componentNameText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+			}
+		});
+
+		label = new Label(container, SWT.NULL);
+		label.setText("&Component class name:");
+
+		componentClassText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		componentClassText.setLayoutData(gd);
+		componentClassText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 			}
 		});
@@ -110,9 +110,9 @@ public class NewComponentWizardPage extends WizardPage {
 
 		if (dev) {
 			projectNameText.setText("test");
-			componentNameText.setText("org.test.Mylabel");
-			tagNameText.setText("mylabel");
-			widgetNameText.setText("test.mylabel");
+			componentClassText.setText("org.test.Mylabel");
+			componentNameText.setText("mylabel");
+			widgetNameText.setText("test.Mylabel");
 		}
 
 		initialize();
@@ -181,15 +181,15 @@ public class NewComponentWizardPage extends WizardPage {
 	}
 
 	public String getComponentPackage() {
-		String val =  componentNameText.getText();
+		String val =  componentClassText.getText();
 		if(val.lastIndexOf(".")!= -1 )
 			return val.substring(0,val.lastIndexOf(".") +1 );
 		else
 			return "";
 	}
 
-	public String getComponentName() {
-		String val =  componentNameText.getText();
+	public String getComponentClass() {
+		String val =  componentClassText.getText();
 		if(val.lastIndexOf(".") != -1 )
 			return val.substring(val.lastIndexOf(".")+1);
 		else
@@ -212,8 +212,8 @@ public class NewComponentWizardPage extends WizardPage {
 			return val;
 	}
 
-	public String getTagName() {
-		return tagNameText.getText();
+	public String getComponentName() {
+		return componentNameText.getText();
 	}
 
 }

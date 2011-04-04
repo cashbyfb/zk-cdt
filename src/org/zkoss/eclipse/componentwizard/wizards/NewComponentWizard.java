@@ -126,11 +126,11 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 
 	private HashMap<String, ITemplateBuilder> prepareFileBuilders() {
 		NewComponentModel comp = new NewComponentModel();
-		comp.setComponentName(page.getComponentName());
+		comp.setComponentClass(page.getComponentClass());
 		comp.setComponentPackage(page.getComponentPackage());
 		comp.setWidgetPackage(page.getWidgetPackage());
 		comp.setWidgetName(page.getWidgetName());
-		comp.setTagName(page.getTagName());
+		comp.setComponentName(page.getComponentName());
 
 		HashMap<String, ITemplateBuilder> builders = new HashMap<String, ITemplateBuilder>();
 		builders.put("resources/metainfo/zk/lang-addon.xml",new ModelTemplate("templates/lang-addon.vtl",comp));
@@ -139,7 +139,7 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		builders.put(packagePath +"Version.java",
 				new ModelTemplate("templates/class_version.vtl",comp));
 
-		builders.put(packagePath + comp.getComponentName()+".java",
+		builders.put(packagePath + comp.getComponentClass()+".java",
 				new ModelTemplate("templates/class_component.vtl",comp));
 
 		return builders;
