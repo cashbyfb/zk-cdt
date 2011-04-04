@@ -10,8 +10,24 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.zkoss.eclipse.template.model.TemplateModel;
 
 public abstract class AbstractTemplate implements ITemplateBuilder {
+
+	TemplateModel model ;
+
+	public AbstractTemplate() {}
+	public AbstractTemplate(TemplateModel model){
+		this.model = model;
+	}
+
+	public abstract String getTemplateName();
+
+	public HashMap<String, Object> getPreparedVariables() {
+		if(model != null)
+			return model.getPreparedVariables();
+		return null;
+	}
 
 	@SuppressWarnings({ "rawtypes" })
 	protected String generator(HashMap args) {
@@ -74,7 +90,6 @@ public abstract class AbstractTemplate implements ITemplateBuilder {
 		return writer.getBuffer().toString();
 	}
 
-	public abstract String getTemplateName();
 
 	/**
 	 * @throws IllegalArgumentException
@@ -83,5 +98,7 @@ public abstract class AbstractTemplate implements ITemplateBuilder {
 	public String build() {
 		return generator(getPreparedVariables());
 	}
+
+
 
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -37,7 +38,8 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 import org.zkoss.eclipse.template.ITemplateBuilder;
-import org.zkoss.eclipse.template.LangAddonTemplate;
+import org.zkoss.eclipse.template.ModelTemplate;
+import org.zkoss.eclipse.template.model.NewComponentModel;
 
 /**
  * This is a sample new wizard. Its role is to create a new file resource in the
@@ -75,8 +77,6 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		final String projectName = page.getProjectName();
-		final String componentName = page.getComponentName();
-
 		final HashMap<String, ITemplateBuilder> builders = prepareFileBuilders();
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
@@ -125,19 +125,44 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 	}
 
 	private HashMap<String, ITemplateBuilder> prepareFileBuilders() {
+		NewComponentModel comp = new NewComponentModel();
+		comp.setComponentName(page.getComponentName());
+		comp.setComponentPackage(page.getComponentPackage());
+		comp.setWidgetPackage(page.getWidgetPackage());
+		comp.setWidgetName(page.getWidgetName());
+		comp.setTagName(page.getTagName());
+
 		HashMap<String, ITemplateBuilder> builders = new HashMap<String, ITemplateBuilder>();
-		builders.put("resources/metainfo/zk/lang-addon.xml",
-				getLangAddonTemplate());
+		builders.put("resources/metainfo/zk/lang-addon.xml",new ModelTemplate("templates/lang-addon.vtl",comp));
+
+		String packagePath = "src/"+page.getComponentPackage().replaceAll("\\.","/");
+		builders.put(packagePath +"Version.java",
+				new ModelTemplate("templates/class_version.vtl",comp));
+
+		builders.put(packagePath + comp.getComponentName()+".java",
+				new ModelTemplate("templates/class_component.vtl",comp));
+
 		return builders;
+	}
+
+	private void createDirs(IProject project,String path) throws CoreException{
+
+		String[] pathtoken = path.split("/");
+		IFolder folder = project.getFolder(pathtoken[0]);
+		if(!folder.exists()) folder.create(true, true, null);
+
+		for(int i = 1 ; i < pathtoken.length ;++i){
+			folder = folder.getFolder(pathtoken[i]);
+			if(!folder.exists()) folder.create(true, true, null);
+		}
+
 	}
 
 	private void buildDirs(IProject project, IProgressMonitor monitor)
 			throws CoreException {
-		project.getFolder("src").create(true, true, monitor);
-		project.getFolder("resources").create(true, true, monitor);
-		project.getFolder("resources/metainfo").create(true, true, monitor);
-		project.getFolder("resources/metainfo/zk").create(true, true, monitor);
-		project.getFolder("resources/web").create(true, true, monitor);
+		createDirs(project,"src");
+		createDirs(project,"resources/metainfo/zk");
+		createDirs(project,"resources/web");
 	}
 
 	private void buildTempates(IProject project,
@@ -153,6 +178,9 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 			if (path.lastIndexOf("/") != -1) {
 				container = path.substring(0, path.lastIndexOf("/"));
 				fileName = path.substring(path.lastIndexOf("/") + 1);
+
+				//make sure the folder exist
+				createDirs(project,container);
 			}
 			createFile(project.getFolder(container), fileName,
 					builders.get(path), monitor);
@@ -240,21 +268,6 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 
 	private InputStream openContentStream(String contents) {
 		return new ByteArrayInputStream(contents.getBytes());
-	}
-
-	private LangAddonTemplate getLangAddonTemplate() {
-		LangAddonTemplate template = new LangAddonTemplate();
-
-		/**
-		 * TODO add them all
-		 */
-		template.setComponentName(page.getComponentName());
-		template.setComponentPackage(page.getComponentPackage());
-		template.setWidgetPackage(page.getWidgetPackage());
-		template.setWidgetName(page.getWidgetName());
-		template.setTagName(page.getTagName());
-
-		return template;
 	}
 
 	private void throwCoreException(String message) throws CoreException {

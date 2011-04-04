@@ -1,19 +1,16 @@
-package org.zkoss.eclipse.template;
+package org.zkoss.eclipse.template.model;
 
 import java.util.HashMap;
 
-import org.zkoss.eclipse.template.AbstractTemplate;
-
 /**
- * ${addon-name} ${version} def => 0.8.0 ${tag-name} ${component-package}
- * ${component-name} ${widget-package} ${widget-name} ${widget-name-lowercase}
- * ${zk-version-since}
+ * I found that we could always use same model when new a component project, so I build a
+ * model to make it easier , but still support complex / hardcode template
+ * config when you wrote your own TemplateBuilder.
  *
- * @author cwang4
+ * @author TonyQ
  *
  */
-public class LangAddonTemplate extends AbstractTemplate {
-
+public class NewComponentModel implements TemplateModel {
 	private String addonName;
 	private String version = "0.8.0";
 	private String tagName;
@@ -25,7 +22,7 @@ public class LangAddonTemplate extends AbstractTemplate {
 
 	private String widgetName;
 
-	private String zkVersionSince ="5.0.5";
+	private String zkVersionSince = "5.0.5";
 
 	public String getAddonName() {
 		return addonName == null ? tagName : addonName;
@@ -55,6 +52,14 @@ public class LangAddonTemplate extends AbstractTemplate {
 		return componentPackage;
 	}
 
+	public String getComponentPackageNoDot() {
+
+		if(componentPackage!=null && componentPackage.endsWith("."))
+			return componentPackage.substring(0,componentPackage.length()-1);
+
+		return componentPackage;
+	}
+
 	public void setComponentPackage(String componentPackage) {
 		this.componentPackage = componentPackage;
 	}
@@ -79,7 +84,7 @@ public class LangAddonTemplate extends AbstractTemplate {
 		return widgetName;
 	}
 
-	private String getWidgetNameLowerCase() {
+	public String getWidgetNameLowerCase() {
 		return widgetName == null ? "" : widgetName.toLowerCase();
 	}
 
@@ -95,12 +100,6 @@ public class LangAddonTemplate extends AbstractTemplate {
 		this.zkVersionSince = zkVersionSince;
 	}
 
-	@Override
-	public String getTemplateName() {
-		return "templates/lang-addon.vtl";
-	}
-
-
 	public HashMap<String, Object> getPreparedVariables() {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 
@@ -108,6 +107,7 @@ public class LangAddonTemplate extends AbstractTemplate {
 		putWithoutNull(map, "version", getVersion());
 		putWithoutNull(map, "tag-name", getTagName());
 
+		putWithoutNull(map, "component-package-no-dot", getComponentPackageNoDot());
 		putWithoutNull(map, "component-package", getComponentPackage());
 		putWithoutNull(map, "component-name", getComponentName());
 
@@ -118,6 +118,12 @@ public class LangAddonTemplate extends AbstractTemplate {
 		putWithoutNull(map, "zk-version-since", getZkVersionSince());
 
 		return map;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void putWithoutNull(HashMap map, String key, Object value) {
+		if (value != null)
+			map.put(key, value);
 	}
 
 }
