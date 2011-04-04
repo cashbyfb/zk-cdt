@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -13,8 +15,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -76,6 +80,12 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 							projectLoc, monitor);
 					addJavaNature(project, monitor);
 					IJavaProject javaProj = JavaCore.create(project);
+					project.getFolder("src").create(true,true,monitor);
+					project.getFolder("resources").create(true,true,monitor);
+					project.getFolder("resources/metainfo").create(true,true,monitor);
+					project.getFolder("resources/metainfo/zk").create(true,true,monitor);
+					project.getFolder("resources/web").create(true,true,monitor);
+					javaProj.setRawClasspath(getDefaultClassPath(javaProj), monitor);
 //					javaProj.setRawClasspath(null, monitor);
 					// doFinish(containerName, fileName, monitor);
 				} catch (CoreException e) {
@@ -97,7 +107,20 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		}
 		return true;
 	}
+	private IClasspathEntry[] getDefaultClassPath(IJavaProject jproj) {
+		List<IClasspathEntry> list= new ArrayList<IClasspathEntry>();
 
+		list.add(JavaCore.newSourceEntry(jproj.getProject().getFolder("src").getFullPath()));
+		list.add(JavaCore.newSourceEntry(jproj.getProject().getFolder("resources").getFullPath()));
+
+
+		IClasspathEntry[] jreEntries= PreferenceConstants.getDefaultJRELibrary();
+
+		for(IClasspathEntry ice:jreEntries){
+			list.add(ice);
+		}
+		return list.toArray(new IClasspathEntry[0]);
+	}
 	public static void addJavaNature(IProject project, IProgressMonitor monitor)
 			throws CoreException {
 		if (monitor != null && monitor.isCanceled()) {
