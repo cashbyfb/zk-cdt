@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="ZK"
+            id="ZK">
+      </category>
+      <wizard
+            category="ZK"
+            class="zkcomponentwizard.wizards.NewComponentWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
+            icon="icons/sample.gif"
+            id="zkcomponentwizard.wizards.NewComponentWizard"
+            name="Component"
+            project="true">
+      </wizard>
+   </extension>
+
+</plugin>
