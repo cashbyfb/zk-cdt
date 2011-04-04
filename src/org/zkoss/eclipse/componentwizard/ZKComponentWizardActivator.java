@@ -1,4 +1,4 @@
-package componentwizard;
+package org.zkoss.eclipse.componentwizard;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

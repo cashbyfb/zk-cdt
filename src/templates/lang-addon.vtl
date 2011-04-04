@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#*
+	The argument we used
+	${addon-name}
+	${version} 					def => 0.8.0
+	${tag-name}
+	${component-package}
+	${component-name}
+	${widget-package}
+	${widget-name}
+	${widget-name-lowercase}
+	${zk-version-since} *#
+<language-addon>
+	<addon-name>${addon-name}</addon-name>
+ 	<version>
+		<version-class>${component-package}.Version</version-class>
+		<version-uid>${version}</version-uid>
+		<zk-version>${zk-version-since}</zk-version><!-- or later -->
+	</version>
+	<language-name>xul/html</language-name>
+	<component>
+		<component-name>${tag-name}</component-name>
+		<component-class>${component-package}${component-name}</component-class>
+		<widget-class>${widget-package}${widget-name}</widget-class>
+		<mold>
+			<mold-name>default</mold-name>
+			<mold-uri>mold/${widget-name-lowercase}.js</mold-uri>
+			<css-uri>css/${widget-name-lowercase}.css.dsp</css-uri>
+		</mold>
+	</component>
+</language-addon>

@@ -1,4 +1,4 @@
-package zkcomponentwizard.wizards;
+package org.zkoss.eclipse.componentwizard.wizards;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -24,15 +24,15 @@ import org.eclipse.swt.widgets.Text;
 
 public class NewComponentWizardPage extends WizardPage {
 
-
 	private Text projectNameText;
-//	private Text addOnNameText;
-
 	private Text tagNameText;
 	private Text componentNameText;
 	private Text widgetNameText;
 
-
+	/**
+	 * for developing mode only to speed up the test case
+	 */
+	private boolean dev = true;
 
 	private ISelection selection;
 
@@ -75,7 +75,6 @@ public class NewComponentWizardPage extends WizardPage {
 			}
 		});
 
-
 		label = new Label(container, SWT.NULL);
 		label.setText("&Tag name:");
 
@@ -86,7 +85,6 @@ public class NewComponentWizardPage extends WizardPage {
 			public void modifyText(ModifyEvent e) {
 			}
 		});
-
 
 		label = new Label(container, SWT.NULL);
 		label.setText("&Component name:");
@@ -110,6 +108,12 @@ public class NewComponentWizardPage extends WizardPage {
 			}
 		});
 
+		if (dev) {
+			projectNameText.setText("test");
+			componentNameText.setText("org.test.Mylabel");
+			tagNameText.setText("mylabel");
+			widgetNameText.setText("test.mylabel");
+		}
 
 		initialize();
 		setControl(container);
@@ -176,12 +180,36 @@ public class NewComponentWizardPage extends WizardPage {
 		return projectNameText.getText();
 	}
 
+	public String getComponentPackage() {
+		String val =  componentNameText.getText();
+		if(val.lastIndexOf(".")!= -1 )
+			return val.substring(0,val.lastIndexOf(".") +1 );
+		else
+			return "";
+	}
+
 	public String getComponentName() {
-		return componentNameText.getText();
+		String val =  componentNameText.getText();
+		if(val.lastIndexOf(".") != -1 )
+			return val.substring(val.lastIndexOf(".")+1);
+		else
+			return val;
+	}
+
+	public String getWidgetPackage() {
+		String val =  widgetNameText.getText();
+		if(val.lastIndexOf(".")!= -1 )
+			return val.substring(0,val.lastIndexOf(".") +1 );
+		else
+			return "";
 	}
 
 	public String getWidgetName() {
-		return widgetNameText.getText();
+		String val =  widgetNameText.getText();
+		if(val.lastIndexOf(".") != -1 )
+			return val.substring(val.lastIndexOf(".")+1);
+		else
+			return val;
 	}
 
 	public String getTagName() {

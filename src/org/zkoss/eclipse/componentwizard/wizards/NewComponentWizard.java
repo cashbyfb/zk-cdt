@@ -1,19 +1,27 @@
-package zkcomponentwizard.wizards;
+package org.zkoss.eclipse.componentwizard.wizards;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -28,6 +36,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
+import org.zkoss.eclipse.template.ITemplateBuilder;
+import org.zkoss.eclipse.template.LangAddonTemplate;
 
 /**
  * This is a sample new wizard. Its role is to create a new file resource in the
@@ -67,6 +77,8 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		final String projectName = page.getProjectName();
 		final String componentName = page.getComponentName();
 
+		final HashMap<String, ITemplateBuilder> builders = prepareFileBuilders();
+
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException {
@@ -79,17 +91,21 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 					JavaCapabilityConfigurationPage.createProject(project,
 							projectLoc, monitor);
 					addJavaNature(project, monitor);
+
+					buildDirs(project, monitor);
+
 					IJavaProject javaProj = JavaCore.create(project);
-					project.getFolder("src").create(true,true,monitor);
-					project.getFolder("resources").create(true,true,monitor);
-					project.getFolder("resources/metainfo").create(true,true,monitor);
-					project.getFolder("resources/metainfo/zk").create(true,true,monitor);
-					project.getFolder("resources/web").create(true,true,monitor);
-					javaProj.setRawClasspath(getDefaultClassPath(javaProj), monitor);
-//					javaProj.setRawClasspath(null, monitor);
+					javaProj.setRawClasspath(getDefaultClassPath(javaProj),
+							monitor);
+
+					buildTempates(project, builders, monitor);
+
+					// javaProj.setRawClasspath(null, monitor);
 					// doFinish(containerName, fileName, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
+				} catch (Error e) {
+					e.printStackTrace();
 				} finally {
 					monitor.done();
 				}
@@ -107,20 +123,60 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		}
 		return true;
 	}
+
+	private HashMap<String, ITemplateBuilder> prepareFileBuilders() {
+		HashMap<String, ITemplateBuilder> builders = new HashMap<String, ITemplateBuilder>();
+		builders.put("resources/metainfo/zk/lang-addon.xml",
+				getLangAddonTemplate());
+		return builders;
+	}
+
+	private void buildDirs(IProject project, IProgressMonitor monitor)
+			throws CoreException {
+		project.getFolder("src").create(true, true, monitor);
+		project.getFolder("resources").create(true, true, monitor);
+		project.getFolder("resources/metainfo").create(true, true, monitor);
+		project.getFolder("resources/metainfo/zk").create(true, true, monitor);
+		project.getFolder("resources/web").create(true, true, monitor);
+	}
+
+	private void buildTempates(IProject project,
+			Map<String, ITemplateBuilder> builders, IProgressMonitor monitor)
+			throws CoreException {
+
+		for (String path : builders.keySet()) {
+			if (builders.get(path) == null) {
+				throw new IllegalArgumentException("builder couldn't be null");
+			}
+			String container = "./";
+			String fileName = path;
+			if (path.lastIndexOf("/") != -1) {
+				container = path.substring(0, path.lastIndexOf("/"));
+				fileName = path.substring(path.lastIndexOf("/") + 1);
+			}
+			createFile(project.getFolder(container), fileName,
+					builders.get(path), monitor);
+		}
+
+	}
+
 	private IClasspathEntry[] getDefaultClassPath(IJavaProject jproj) {
-		List<IClasspathEntry> list= new ArrayList<IClasspathEntry>();
+		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
 
-		list.add(JavaCore.newSourceEntry(jproj.getProject().getFolder("src").getFullPath()));
-		list.add(JavaCore.newSourceEntry(jproj.getProject().getFolder("resources").getFullPath()));
+		list.add(JavaCore.newSourceEntry(jproj.getProject().getFolder("src")
+				.getFullPath()));
+		list.add(JavaCore.newSourceEntry(jproj.getProject()
+				.getFolder("resources").getFullPath()));
 
+		IClasspathEntry[] jreEntries = PreferenceConstants
+				.getDefaultJRELibrary();
 
-		IClasspathEntry[] jreEntries= PreferenceConstants.getDefaultJRELibrary();
-
-		for(IClasspathEntry ice:jreEntries){
+		for (IClasspathEntry ice : jreEntries) {
 			list.add(ice);
 		}
 		return list.toArray(new IClasspathEntry[0]);
 	}
+
 	public static void addJavaNature(IProject project, IProgressMonitor monitor)
 			throws CoreException {
 		if (monitor != null && monitor.isCanceled()) {
@@ -147,50 +203,58 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 	 * file.
 	 */
 
-	private void doFinish(String containerName, String fileName,
-			IProgressMonitor monitor) throws CoreException {
-		// // create a sample file
-		// monitor.beginTask("Creating " + fileName, 2);
-		// IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		// IResource resource = root.findMember(new Path(containerName));
-		// if (!resource.exists() || !(resource instanceof IContainer)) {
-		// throwCoreException("Container \"" + containerName
-		// + "\" does not exist.");
-		// }
-		// IContainer container = (IContainer) resource;
-		// final IFile file = container.getFile(new Path(fileName));
-		// try {
-		// InputStream stream = openContentStream();
-		// if (file.exists()) {
-		// file.setContents(stream, true, true, monitor);
-		// } else {
-		// file.create(stream, true, monitor);
-		// }
-		// stream.close();
-		// } catch (IOException e) {
-		// }
-		// monitor.worked(1);
-		// monitor.setTaskName("Opening file for editing...");
-		// getShell().getDisplay().asyncExec(new Runnable() {
-		// public void run() {
-		// IWorkbenchPage page = PlatformUI.getWorkbench()
-		// .getActiveWorkbenchWindow().getActivePage();
-		// try {
-		// IDE.openEditor(page, file, true);
-		// } catch (PartInitException e) {
-		// }
-		// }
-		// });
-		// monitor.worked(1);
+	private void createFile(IResource resource, String fileName,
+			ITemplateBuilder template, IProgressMonitor monitor)
+			throws CoreException {
+		// create a sample file
+
+		if (resource == null) {
+			throwCoreException("Container is not given.");
+		}
+
+		monitor.beginTask("Creating " + fileName, 2);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		if (!resource.exists() || !(resource instanceof IContainer)) {
+			throwCoreException("Container \"" + resource.getName()
+					+ "\" does not exist.");
+		}
+		IContainer container = (IContainer) resource;
+		final IFile file = container.getFile(new Path(fileName));
+		try {
+			InputStream stream = openContentStream(template.build());
+			if (file.exists()) {
+				file.setContents(stream, true, true, monitor);
+			} else {
+				file.create(stream, true, monitor);
+			}
+			stream.close();
+		} catch (IOException e) {
+		}
+		monitor.worked(1);
+
 	}
 
 	/**
 	 * We will initialize file contents with a sample text.
 	 */
 
-	private InputStream openContentStream() {
-		String contents = "This is the initial file contents for *.xml file that should be word-sorted in the Preview page of the multi-page editor";
+	private InputStream openContentStream(String contents) {
 		return new ByteArrayInputStream(contents.getBytes());
+	}
+
+	private LangAddonTemplate getLangAddonTemplate() {
+		LangAddonTemplate template = new LangAddonTemplate();
+
+		/**
+		 * TODO add them all
+		 */
+		template.setComponentName(page.getComponentName());
+		template.setComponentPackage(page.getComponentPackage());
+		template.setWidgetPackage(page.getWidgetPackage());
+		template.setWidgetName(page.getWidgetName());
+		template.setTagName(page.getTagName());
+
+		return template;
 	}
 
 	private void throwCoreException(String message) throws CoreException {
