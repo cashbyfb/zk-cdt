@@ -21,6 +21,8 @@ public class ZKComponentWizardActivator extends AbstractUIPlugin {
 	// The shared instance
 	private static ZKComponentWizardActivator plugin;
 
+	public static final String CONTAINER_ZK="ZKContainer";
+
 	/**
 	 * The constructor
 	 */

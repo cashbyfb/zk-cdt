@@ -36,6 +36,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
+import org.zkoss.eclipse.componentwizard.ZKComponentWizardActivator;
 import org.zkoss.eclipse.template.ITemplateBuilder;
 import org.zkoss.eclipse.template.ModelTemplate;
 import org.zkoss.eclipse.template.model.NewComponentModel;
@@ -210,6 +211,8 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 				.getFullPath()));
 		list.add(JavaCore.newSourceEntry(jproj.getProject()
 				.getFolder("resources").getFullPath()));
+
+		list.add(JavaCore.newContainerEntry(new Path(ZKComponentWizardActivator.CONTAINER_ZK)));
 
 		IClasspathEntry[] jreEntries = PreferenceConstants
 				.getDefaultJRELibrary();

@@ -18,5 +18,12 @@
             project="true">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.jdt.core.classpathContainerInitializer">
+      <classpathContainerInitializer
+            class="org.zkoss.bundles.ZKClasspathContainerInitializer"
+            id="ZKContainer">
+      </classpathContainerInitializer>
+   </extension>
 
 </plugin>
