@@ -82,4 +82,8 @@ public class ZKComponentWizardActivator extends AbstractUIPlugin {
 				.getSymbolicName(), IStatus.ERROR, msg + "\n", null);
 		log.log(status);
 	}
+
+	static public void logWarning(String msg) {
+		logError(msg);
+	}
 }

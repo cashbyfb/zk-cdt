@@ -11,20 +11,34 @@
 	${widget-name-lowercase}
 	${zk-version-since} *#
 <language-addon>
-	<addon-name>${addon-name}</addon-name>
+	<addon-name>${addon-name}</addon-name> <!-- required -->
+
  	<version>
 		<version-class>${component-package}Version</version-class>
 		<version-uid>${version}</version-uid>
 		<zk-version>${zk-version-since}</zk-version><!-- or later -->
 	</version>
+
 	<language-name>xul/html</language-name>
 	<component>
-		<component-name>${component-name}</component-name>
-		<component-class>${component-package}${component-class}</component-class>
-		<widget-class>${widget-package}${widget-name}</widget-class>
+		<component-name>${component-name}</component-name> <!-- required -->
+		<component-class>${component-package}${component-class}</component-class> <!-- required -->
+		<widget-class>${widget-package}${widget-name}</widget-class> <!-- required -->
 		<mold>
 			<mold-name>default</mold-name>
 			<mold-uri>mold/${widget-name-lowercase}.js</mold-uri>
+
+			<!--
+			== Tip in advance ==
+				You don't have to specify a css.dsp if you need not ,
+				but usually you need it.
+
+				You could assign a .css file ,too.
+
+				The css.dsp is almost as same as CSS file ,
+				but have more powerful enhancement.	(like EL support.)
+			====
+			-->
 			<css-uri>css/${widget-name-lowercase}.css.dsp</css-uri>
 		</mold>
 	</component>

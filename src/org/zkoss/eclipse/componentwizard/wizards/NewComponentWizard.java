@@ -39,6 +39,7 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.zkoss.eclipse.template.ITemplateBuilder;
 import org.zkoss.eclipse.template.ModelTemplate;
 import org.zkoss.eclipse.template.model.NewComponentModel;
+import org.zkoss.eclipse.template.model.NewComponentProjectModel;
 
 /**
  * This is a sample new wizard. Its role is to create a new file resource in the
@@ -124,22 +125,37 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 	}
 
 	private HashMap<String, ITemplateBuilder> prepareFileBuilders() {
-		NewComponentModel comp = new NewComponentModel();
-		comp.setComponentClass(page.getComponentClass());
-		comp.setComponentPackage(page.getComponentPackage());
-		comp.setWidgetPackage(page.getWidgetPackage());
-		comp.setWidgetName(page.getWidgetName());
-		comp.setComponentName(page.getComponentName());
+		NewComponentModel compModel = new NewComponentModel();
+		compModel.setComponentClass(page.getComponentClass());
+		compModel.setComponentPackage(page.getComponentPackage());
+		compModel.setWidgetPackage(page.getWidgetPackage());
+		compModel.setWidgetName(page.getWidgetName());
+		compModel.setComponentName(page.getComponentName());
+
+		NewComponentProjectModel compProjectModel = new NewComponentProjectModel(compModel);
 
 		HashMap<String, ITemplateBuilder> builders = new HashMap<String, ITemplateBuilder>();
-		builders.put("resources/metainfo/zk/lang-addon.xml",new ModelTemplate("templates/lang-addon.vtl",comp));
 
-		String packagePath = "src/"+page.getComponentPackage().replaceAll("\\.","/");
-		builders.put(packagePath +"Version.java",
-				new ModelTemplate("templates/class_version.vtl",comp));
+		builders.put("resources/metainfo/zk/lang-addon.xml",
+				new ModelTemplate("templates/xml_lang-addon.vtl",compProjectModel));
 
-		builders.put(packagePath + comp.getComponentClass()+".java",
-				new ModelTemplate("templates/class_component.vtl",comp));
+		builders.put(compProjectModel.getComponentPackagePath() +"Version.java",
+				new ModelTemplate("templates/class_version.vtl",compProjectModel));
+
+		builders.put(compProjectModel.getComponentPackagePath() + compProjectModel.getComponentClass()+".java",
+				new ModelTemplate("templates/class_component.vtl",compProjectModel));
+
+		builders.put(compProjectModel.getWidgetPackagePath()+"zk.wpd",
+				new ModelTemplate("templates/xml_zk_wpd.vtl",compProjectModel));
+
+		builders.put(compProjectModel.getWidgetPackagePath()+compProjectModel.getWidgetName()+".js",
+				new ModelTemplate("templates/js_widget.vtl",compProjectModel));
+
+		builders.put(compProjectModel.getWidgetPackagePath()+"mold/"+compProjectModel.getWidgetNameLowerCase()+".js",
+				new ModelTemplate("templates/js_mold.vtl",compProjectModel));
+
+		builders.put(compProjectModel.getWidgetPackagePath()+"css/"+compProjectModel.getWidgetNameLowerCase()+".css.dsp",
+				new ModelTemplate("templates/dsp_css.vtl",compProjectModel));
 
 		return builders;
 	}

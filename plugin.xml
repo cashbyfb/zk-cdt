@@ -14,7 +14,7 @@
             finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
             icon="icons/sample.gif"
             id="zkcomponentwizard.wizards.NewComponentWizard"
-            name="Component"
+            name="Hello Component"
             project="true">
       </wizard>
    </extension>
