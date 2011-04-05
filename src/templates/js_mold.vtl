@@ -15,7 +15,7 @@ function (out) {
 		class="${zcls} ${this.getSclass()}" id="${uuid}"
 	*/
 	out.push('<span ', this.domAttrs_(), '>');
-
+	out.push(this._text);
 	out.push('</span>');
 
 }
