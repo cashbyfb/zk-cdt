@@ -158,6 +158,12 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		builders.put(compProjectModel.getWidgetPackagePath()+"css/"+compProjectModel.getWidgetNameLowerCase()+".css.dsp",
 				new ModelTemplate("templates/dsp_css.vtl",compProjectModel));
 
+
+		builders.put("test/webapp/WEB-INF/web.xml",
+				new ModelTemplate("templates/xml_web.vtl",compProjectModel));
+		builders.put("test/webapp/index.zul",
+				new ModelTemplate("templates/zul_index.vtl",compProjectModel));
+
 		return builders;
 	}
 
