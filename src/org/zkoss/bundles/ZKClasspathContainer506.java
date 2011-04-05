@@ -12,18 +12,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
-import org.eclipse.jdt.launching.JavaRuntime;
 import org.osgi.framework.Bundle;
 import org.zkoss.eclipse.componentwizard.ZKComponentWizardActivator;
 
 public class ZKClasspathContainer506 implements IClasspathContainer {
-	/**
-	 * TODO review this class
-	 *
-	 * @return
-	 */
-
 	private IClasspathEntry[] getZKBundle() {
 
 		List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
@@ -39,6 +31,7 @@ public class ZKClasspathContainer506 implements IClasspathContainer {
 		addRelativeArchiveEntry(entries, installUrl, "zkplus.jar");
 		addRelativeArchiveEntry(entries, installUrl, "zul.jar");
 		addRelativeArchiveEntry(entries, installUrl, "zweb.jar");
+		addRelativeArchiveEntry(entries, installUrl, "commons-fileupload.jar");
 
 		return entries.toArray(new IClasspathEntry[0]);
 	}
