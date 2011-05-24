@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.zkoss.zk</groupId>
-	<artifactId>largegrid</artifactId>
+	<artifactId>${component-name}</artifactId>
 	<properties>
 		<zkel.version>1.1.0</zkel.version>
 		<commons-lang.version>2.4</commons-lang.version>
@@ -195,5 +195,13 @@
 				<directory>${pre}{project.basedir}/resources/</directory>
 			</resource>
 		</resources>
+        <plugins>
+                 <!-- add plug-in confiugration here -->
+                <plugin>
+                        <groupId>org.zkoss.maven</groupId>
+                        <artifactId>yuicompressor-maven-plugin-zk</artifactId>
+                        <version>1.1.6</version>
+                </plugin>
+       </plugins>
 	</build>
 </project>
