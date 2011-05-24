@@ -15,7 +15,8 @@ import org.zkoss.eclipse.componentwizard.ZKComponentWizardActivator;
 public class NewComponentProjectModel implements TemplateModel {
 	private String addonName;
 	private String version = "0.8.0";
-	private String zkVersionSince = "5.0.5";
+	private String zkVersionSince = "5.0.0";
+	private String zkVersion = "5.0.6";
 
 	private NewComponentModel newComponentModel;
 
@@ -54,6 +55,8 @@ public class NewComponentProjectModel implements TemplateModel {
 		putWithoutNull(map, "addon-name", getAddonName());
 		putWithoutNull(map, "version", getVersion());
 		putWithoutNull(map, "zk-version-since", getZkVersionSince());
+
+		putWithoutNull(map, "zk-version", getZkVersion());
 
 		HashMap<String, Object> compMap = newComponentModel
 				.getPreparedVariables();
@@ -96,6 +99,14 @@ public class NewComponentProjectModel implements TemplateModel {
 
 	public String getWidgetNameLowerCase() {
 		return newComponentModel.getWidgetNameLowerCase();
+	}
+
+	public String getZkVersion() {
+		return zkVersion;
+	}
+
+	public void setZkVersion(String zkVersion) {
+		this.zkVersion = zkVersion;
 	}
 
 }

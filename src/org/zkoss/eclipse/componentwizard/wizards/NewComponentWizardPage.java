@@ -24,19 +24,15 @@ import org.eclipse.swt.widgets.Text;
 
 public class NewComponentWizardPage extends WizardPage {
 
-	private Text projectNameText;
-	private Text componentNameText;
-	private Text componentClassText;
-	private Text widgetNameText;
+	protected Text projectNameText;
+	protected Text componentNameText;
+	protected Text componentClassText;
+	protected Text widgetNameText;
 
-	/**
-	 * for developing mode only to speed up the test case
-	 */
-	private boolean dev = true;
 
-	private ISelection selection;
+	protected ISelection selection;
 
-	private static final String PAGE_NAME = " ZKComponentWizardPage";
+	public static final String PAGE_NAME = " ZKComponentWizardPage";
 
 	/**
 	 * Constructor for SampleNewWizardPage.
@@ -49,20 +45,15 @@ public class NewComponentWizardPage extends WizardPage {
 		setDescription("The wizard create a ZK Component skeleton.");
 		this.selection = selection;
 	}
+	public NewComponentWizardPage(String pageName,ISelection selection) {
+		super(pageName);
+		setTitle("ZK Component Wizard");
+		setDescription("The wizard create a ZK Component skeleton.");
+		this.selection = selection;
+	}
 
-	/**
-	 * @see IDialogPage#createControl(Composite)
-	 */
-	public void createControl(Composite parent) {
-		/**
-		 * TODO add workspace location
-		 */
+	protected void createSubControls(Composite container){
 
-		Composite container = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		container.setLayout(layout);
-		layout.numColumns = 2;
-		layout.verticalSpacing = 9;
 		Label label = new Label(container, SWT.NULL);
 		label.setText("&ProjectName:");
 
@@ -108,12 +99,27 @@ public class NewComponentWizardPage extends WizardPage {
 			}
 		});
 
-		if (dev) {
-			projectNameText.setText("test");
-			componentClassText.setText("org.test.Mylabel");
-			componentNameText.setText("mylabel");
-			widgetNameText.setText("test.Mylabel");
-		}
+		projectNameText.setText("test");
+		componentClassText.setText("org.test.Mylabel");
+		componentNameText.setText("mylabel");
+		widgetNameText.setText("test.Mylabel");
+	}
+
+	/**
+	 * @see IDialogPage#createControl(Composite)
+	 */
+	public void createControl(Composite parent) {
+		/**
+		 * TODO add workspace location
+		 */
+
+		Composite container = new Composite(parent, SWT.NULL);
+		GridLayout layout = new GridLayout();
+		container.setLayout(layout);
+		layout.numColumns = 2;
+		layout.verticalSpacing = 9;
+
+		createSubControls(container);
 
 		initialize();
 		setControl(container);

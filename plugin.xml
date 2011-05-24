@@ -4,26 +4,34 @@
 
    <extension
          point="org.eclipse.ui.newWizards">
-      <category
-            name="ZK"
-            id="ZK">
-      </category>
-      <wizard
-            category="ZK"
-            class="org.zkoss.eclipse.componentwizard.wizards.NewComponentWizard"
-            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
-            icon="icons/sample.gif"
-            id="zkcomponentwizard.wizards.NewComponentWizard"
-            name="Hello Component"
-            project="true">
-      </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.jdt.core.classpathContainerInitializer">
-      <classpathContainerInitializer
-            class="org.zkoss.bundles.ZKClasspathContainerInitializer"
-            id="ZKContainer">
-      </classpathContainerInitializer>
-   </extension>
+		<category name="ZK" id="org.zkoss.eclipse.wizards">
+		</category>
+		<wizard
+        category="org.zkoss.eclipse.wizards"
+        class="org.zkoss.eclipse.componentwizard.wizards.NewComponentWizard"
+        finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
+        icon="icons/sample.gif"
+        id="zkcomponentwizard.wizards.NewComponentWizard"
+        name="Hello Component"
+        preferredPerspectives="org.zkoss.eclipse.setting.perspectives.zk_perspective"
+        project="true">
+		</wizard>
+  <wizard
+        category="org.zkoss.eclipse.wizards"
+        class="org.zkoss.eclipse.componentwizard.wizards.NewMavenComponentWizard"
+        finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
+        icon="icons/sample.gif"
+        id="zkcomponentwizard.wizards.NewComponentWizard"
+        name="Hello Maven Component"
+        project="true">
+  </wizard>
+	</extension>
+	<extension
+	         point="org.eclipse.jdt.core.classpathContainerInitializer">
+		<classpathContainerInitializer
+		            class="org.zkoss.bundles.ZKClasspathContainerInitializer"
+		            id="ZKContainer">
+		</classpathContainerInitializer>
+	</extension>
 
 </plugin>

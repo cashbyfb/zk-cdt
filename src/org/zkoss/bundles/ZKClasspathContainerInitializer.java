@@ -19,6 +19,8 @@ public class ZKClasspathContainerInitializer extends ClasspathContainerInitializ
 	public void initialize(IPath containerPath, IJavaProject project)
 			throws CoreException {
 
+
+		//TODO review this
 		if(ZKComponentWizardActivator.CONTAINER_ZK.equals(containerPath.toString())){
 			JavaCore.setClasspathContainer(containerPath, new IJavaProject[] { project },
 					new IClasspathContainer[] { new ZKClasspathContainer506() }, null);

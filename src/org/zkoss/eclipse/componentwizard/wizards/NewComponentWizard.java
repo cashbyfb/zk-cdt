@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +53,8 @@ import org.zkoss.eclipse.template.model.NewComponentProjectModel;
  */
 
 public class NewComponentWizard extends Wizard implements INewWizard {
-	private NewComponentWizardPage page;
-	private ISelection selection;
+	protected NewComponentWizardPage page;
+	protected ISelection selection;
 
 	/**
 	 * Constructor for NewComponentWizard.
@@ -72,13 +73,17 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		addPage(page);
 	}
 
+	protected void doAfterCreated(IJavaProject project){
+
+	}
+
 	/**
 	 * This method is called when 'Finish' button is pressed in the wizard. We
 	 * will create an operation and run it using wizard as execution context.
 	 */
 	public boolean performFinish() {
 		final String projectName = page.getProjectName();
-		final HashMap<String, ITemplateBuilder> builders = prepareFileBuilders();
+		final HashMap<String, ITemplateBuilder> builders = prepareFileBuilders(prepareNewComponentModel());
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor)
@@ -96,16 +101,17 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 					buildDirs(project, monitor);
 
 					IJavaProject javaProj = JavaCore.create(project);
-					javaProj.setRawClasspath(getDefaultClassPath(javaProj),
+					javaProj.setRawClasspath(prepareProjectClassPath(javaProj),
 							monitor);
 
 					buildTempates(project, builders, monitor);
 
+					doAfterCreated(javaProj);
 					// javaProj.setRawClasspath(null, monitor);
 					// doFinish(containerName, fileName, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
-				} catch (Error e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
 					monitor.done();
@@ -124,8 +130,7 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		}
 		return true;
 	}
-
-	private HashMap<String, ITemplateBuilder> prepareFileBuilders() {
+	protected NewComponentProjectModel prepareNewComponentModel() {
 		NewComponentModel compModel = new NewComponentModel();
 		compModel.setComponentClass(page.getComponentClass());
 		compModel.setComponentPackage(page.getComponentPackage());
@@ -133,7 +138,11 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		compModel.setWidgetName(page.getWidgetName());
 		compModel.setComponentName(page.getComponentName());
 
-		NewComponentProjectModel compProjectModel = new NewComponentProjectModel(compModel);
+		return new NewComponentProjectModel(compModel);
+	}
+
+	protected HashMap<String, ITemplateBuilder> prepareFileBuilders(NewComponentProjectModel compProjectModel) {
+
 
 		HashMap<String, ITemplateBuilder> builders = new HashMap<String, ITemplateBuilder>();
 
@@ -199,41 +208,68 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 			if (builders.get(path) == null) {
 				throw new IllegalArgumentException("builder couldn't be null");
 			}
+			IResource root = null;
 			String container = "./";
 			String fileName = path;
 			if (path.lastIndexOf("/") != -1) {
 				container = path.substring(0, path.lastIndexOf("/"));
 				fileName = path.substring(path.lastIndexOf("/") + 1);
 
+				root = project.getFolder(container);
 				//make sure the folder exist
 				createDirs(project,container);
+			}else{
+				root = project;
 			}
-			createFile(project.getFolder(container), fileName,
+			createFile(root, fileName,
 					builders.get(path), monitor);
 		}
 
 	}
 
-	private IClasspathEntry[] getDefaultClassPath(IJavaProject jproj) {
-		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
-
-		list.add(JavaCore.newSourceEntry(jproj.getProject().getFolder("src")
-				.getFullPath()));
-		list.add(JavaCore.newSourceEntry(jproj.getProject()
-				.getFolder("resources").getFullPath()));
-
-		list.add(JavaCore.newContainerEntry(new Path(ZKComponentWizardActivator.CONTAINER_ZK)));
-
-		IClasspathEntry[] jreEntries = PreferenceConstants
-				.getDefaultJRELibrary();
-
-		for (IClasspathEntry ice : jreEntries) {
-			list.add(ice);
-		}
+	protected IClasspathEntry[] prepareProjectClassPath(IJavaProject jproj) {
+		List<IClasspathEntry> list = prepareDefaultClassPath(jproj);
+		list.addAll(prepareSpecficClassPath(jproj));
 		return list.toArray(new IClasspathEntry[0]);
 	}
 
-	public static void addJavaNature(IProject project, IProgressMonitor monitor)
+	protected List<IClasspathEntry> prepareSpecficClassPath(IJavaProject jproj) {
+
+		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
+		list.add(JavaCore.newContainerEntry(new Path(ZKComponentWizardActivator.CONTAINER_ZK)));
+		return list;
+
+	}
+
+	protected List<IClasspathEntry> prepareDefaultClassPath(IJavaProject jproj) {
+		List<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
+
+		IProject proj = jproj.getProject();
+		list.add(JavaCore.newSourceEntry(proj.getFolder("src")
+				.getFullPath()));
+		list.add(JavaCore.newSourceEntry(proj.getFolder("resources").getFullPath()));
+
+
+		IClasspathEntry[] jreEntries = PreferenceConstants.getDefaultJRELibrary();
+
+		for (IClasspathEntry ice : jreEntries){
+			list.add(ice);
+		}
+
+		return list;
+	}
+
+	protected void addNuewNature(IProject project, IProgressMonitor monitor,List<String> currentNature){
+
+	}
+
+	/**
+	 * TODO review this nature structs.
+	 * @param project
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	public void addJavaNature(IProject project, IProgressMonitor monitor)
 			throws CoreException {
 		if (monitor != null && monitor.isCanceled()) {
 			throw new OperationCanceledException();
@@ -241,10 +277,10 @@ public class NewComponentWizard extends Wizard implements INewWizard {
 		if (!project.hasNature(JavaCore.NATURE_ID)) {
 			IProjectDescription description = project.getDescription();
 			String[] prevNatures = description.getNatureIds();
-			String[] newNatures = new String[prevNatures.length + 1];
-			System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-			newNatures[prevNatures.length] = JavaCore.NATURE_ID;
-			description.setNatureIds(newNatures);
+			List<String> list = new ArrayList(Arrays.asList(prevNatures));
+			list.add(JavaCore.NATURE_ID);
+			addNuewNature(project , monitor,list);
+			description.setNatureIds(list.toArray(new String[0]));
 			project.setDescription(description, monitor);
 		} else {
 			if (monitor != null) {
