@@ -53,7 +53,7 @@ import org.zkoss.eclipse.template.model.NewComponentProjectModel;
  */
 
 public class NewComponentWizard extends Wizard implements INewWizard {
-	protected NewComponentWizardPage page;
+	protected NewComponentWizardPage page = null;
 	protected ISelection selection;
 
 	/**

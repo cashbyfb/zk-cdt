@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.zkoss.eclipse.template.ITemplateBuilder;
 import org.zkoss.eclipse.template.ModelTemplate;
+import org.zkoss.eclipse.template.model.NewComponentModel;
 import org.zkoss.eclipse.template.model.NewComponentProjectModel;
 
 /**
@@ -32,9 +33,10 @@ public class NewMavenComponentWizard extends NewComponentWizard {
 
 	protected HashMap<String, ITemplateBuilder> prepareFileBuilders(
 			NewComponentProjectModel compProjectModel) {
-		HashMap<String, ITemplateBuilder> builders =  super.prepareFileBuilders(compProjectModel);
-		builders.put("pom.xml",
-				new ModelTemplate("templates/xml_pom.vtl",compProjectModel));
+		HashMap<String, ITemplateBuilder> builders = super
+				.prepareFileBuilders(compProjectModel);
+		builders.put("pom.xml", new ModelTemplate("templates/xml_pom.vtl",
+				compProjectModel));
 		return builders;
 	}
 
@@ -43,19 +45,25 @@ public class NewMavenComponentWizard extends NewComponentWizard {
 		addPage(page);
 	}
 
+	protected NewComponentProjectModel prepareNewComponentModel() {
+		NewComponentProjectModel projModel = super.prepareNewComponentModel();
 
-	@Override
+		NewMavenComponentWizardPage newpage = (NewMavenComponentWizardPage) page;
+		projModel.setZkVersion(newpage.getZKVersion());
+
+		return projModel;
+	}
+
 	protected List<IClasspathEntry> prepareSpecficClassPath(IJavaProject jproj) {
-		return new ArrayList<IClasspathEntry> ();
+		return new ArrayList<IClasspathEntry>();
 	}
 	/*
-	 * TODO review this
-	 * not working now
+	 * TODO review this not working now
 	 */
-//	protected void addNuewNature(IProject project, IProgressMonitor monitor,
-//			List<String> currentNature) {
-//		super.addNuewNature(project, monitor, currentNature);
-//		currentNature.add("org.maven.ide.eclipse.maven2Nature");
-//	}
+	// protected void addNuewNature(IProject project, IProgressMonitor monitor,
+	// List<String> currentNature) {
+	// super.addNuewNature(project, monitor, currentNature);
+	// currentNature.add("org.maven.ide.eclipse.maven2Nature");
+	// }
 
 }

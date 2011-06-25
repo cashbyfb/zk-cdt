@@ -109,4 +109,12 @@ public class NewComponentProjectModel implements TemplateModel {
 		this.zkVersion = zkVersion;
 	}
 
+	public NewComponentModel getComponentModel() {
+		return newComponentModel;
+	}
+
+	public void setComponentModel(NewComponentModel newComponentModel) {
+		this.newComponentModel = newComponentModel;
+	}
+
 }
